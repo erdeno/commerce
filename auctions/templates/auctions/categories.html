@@ -1,0 +1,104 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %} Categories {% endblock title %}
+
+{% block body %}
+    <h2>Categories</h2>
+
+
+
+
+
+          <div class="container">
+            <div class="row">
+
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Category Name</th>
+                    <th scope="col">Item Count</th>
+                  </tr>
+                </thead>
+
+
+                    <tbody>
+                      {% for category in categories %}
+                      <tr>
+                        <th scope="row">{{ forloop.counter }} </th>
+                        <td><a href="{% url 'category_detail' category.id %}">{{ category.category_name }}</a></td>
+                        <td>{{ category.item_count }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+
+
+              <!-- <ul>
+                {% for category in categories %}
+                  <a href="{% url 'category_detail' category.id %}"><li>{{ category }}</li></a>
+
+                {% endfor %}
+
+              </ul> -->
+
+
+
+
+            </div>
+            {% if user.is_superuser %}
+
+
+            <a style="text-decoration:none"><h2><i class="fa fa-plus-circle"></i> Create New Category</h2></a>
+
+            <form action="{% url 'create_category' %}" method="post">
+              {% csrf_token %}
+              <div class="row">
+                  <div class="col">
+                    <input name="newCategory" type="text" class="form-control" placeholder="Category Name">
+                  </div>
+                  <div class="col">
+                    <button type="submit" class="btn btn-primary" id="sendMessageButton">Create</button>
+                  </div>
+                </div>
+
+            </form>
+
+            {% endif %}
+
+      </div>
+
+      <!-- Pager -->
+      <div class="clearfix">
+        {% if categories.has_other_pages %}
+          {% if categories.number == 1 %}
+              <a class="btn btn-primary float-right" href="?page=2">Next Page &rarr;</a>
+          {% else %}
+
+              {% if categories.has_previous %}
+                  <a class="btn btn-outline-info" href="{% url 'categories' %}">&laquo;</a>
+                  <a class="btn btn-outline-info" href="?page={{ categories.previous_page_number }}">&lsaquo;</a>
+              {% endif %}
+
+
+              {% for num in categories.paginator.page_range  %}
+                {% if categories.number == num and categories.number != 1 %}
+                    <a class="btn btn-outline-info disabled">{{ num }}</a>
+                {% endif %}
+              {% endfor %}
+
+
+              {% if categories.has_next %}
+                  <a class="btn btn-outline-info" href="?page={{ categories.next_page_number }}">&rsaquo;</a>
+                  <a class="btn btn-outline-info" href="?page={{categories.paginator.num_pages}}">&raquo;</a>
+
+              {% endif %}
+
+          {% endif %}
+
+        {% endif %}
+
+      </div>
+
+{% endblock %}

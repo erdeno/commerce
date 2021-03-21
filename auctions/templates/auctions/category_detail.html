@@ -1,0 +1,85 @@
+{% extends "auctions/layout.html" %}
+
+
+{% block title %}{{category.category_name}}{% endblock %}
+
+
+{% block body %}
+
+
+<main role="main" class="container">
+  <h3>{{category.category_name}}:</h3>
+  {% if items_in_category %}
+
+        <div class="album py-5 bg-light">
+          <div class="container">
+
+            <div class="row">
+            {% for item in items_in_category %}
+
+                  <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ item.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Price: ${{ item.current_price }}</h6>
+                        <p class="card-text"><span class="d-inline-block text-truncate" style="max-width: 300px;">
+                            {{ item.description }}
+                          </span></p>
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div class="btn-group">
+                            <a href="{% url 'item' item.id %}" role="button" class="btn btn-sm btn-outline-secondary">View</a>
+                          </div>
+                          <small class="text-muted">{{ item.date|date }}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+            {% endfor %}
+          </div>
+
+
+          </div>
+        </div>
+
+  {% endif %}
+
+
+
+</main><!-- /.container -->
+
+
+<!-- Pager -->
+<div class="clearfix">
+  {% if items_in_category.has_other_pages %}
+    {% if items_in_category.number == 1 %}
+        <a class="btn btn-primary float-right" href="?page=2">Next Page &rarr;</a>
+    {% else %}
+
+        {% if items_in_category.has_previous %}
+            <a class="btn btn-outline-info" href="{% url 'category_detail' category.id %}">&laquo;</a>
+            <a class="btn btn-outline-info" href="?page={{ items_in_category.previous_page_number }}">&lsaquo;</a>
+        {% endif %}
+
+
+        {% for num in items_in_category.paginator.page_range  %}
+          {% if items_in_category.number == num and categories.number != 1 %}
+              <a class="btn btn-outline-info disabled">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+
+        {% if items_in_category.has_next %}
+            <a class="btn btn-outline-info" href="?page={{ items_in_category.next_page_number }}">&rsaquo;</a>
+            <a class="btn btn-outline-info" href="?page={{items_in_category.paginator.num_pages}}">&raquo;</a>
+
+        {% endif %}
+
+    {% endif %}
+
+  {% endif %}
+
+</div>
+
+{% endblock %}

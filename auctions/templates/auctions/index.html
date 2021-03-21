@@ -1,0 +1,84 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Auctions{% endblock title %}
+{% block body %}
+
+
+
+
+    <h2>Active Listings</h2>
+
+    {% if messages %}
+      <ul class="messages">
+          {% for message in messages %}
+          <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+      </ul>
+    {% endif %}
+
+  {% for item in object_list %}
+    {% if item.is_active %}
+
+        <div class="row">
+
+          <div class="col-md-6 col-lg-12">
+
+            <div class="card flex-md-row mb-4 box-shadow h-md-250">
+              <img class="card-img-right flex-auto d-none d-md-block" id = "item-img" src="{{ item.image_url }}" alt="Card image cap">
+              <div class="card-body d-flex flex-column align-items-start">
+                <a href="{% url 'item' item.id %}"><strong class="d-inline-block mb-2 text-primary">{{ item.title }}</strong></a>
+                <h3 class="mb-0">
+                  <b>Price: </b>${{ item.current_price }}
+                </h3>
+                <div class="mb-1 text-muted">Created by {{ item.created_by }} on {{ item.date|date }}</div>
+                <p class="card-text mb-auto">
+                  <span class="d-inline-block text-truncate" style="max-width: 600px;">
+                    {{ item.description }}
+                  </span></p>
+                  <a href="{% url 'item' item.id %}" class="card-link">Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+    {% endif %}
+
+
+  {% endfor %}
+
+
+
+
+            <!-- Pager -->
+            <div class="clearfix">
+              {% if is_paginated %}
+                {% if page_obj.number == 1 %}
+                    <a class="btn btn-primary float-right" href="?page=2">More Listings &rarr;</a>
+                {% else %}
+
+                    {% if page_obj.has_previous %}
+                        <a class="btn btn-outline-info" href="{% url 'index' %}">&laquo;</a>
+                        <a class="btn btn-outline-info" href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
+                    {% endif %}
+
+
+                    {% for num in page_obj.paginator.page_range  %}
+                      {% if page_obj.number == num and page_obj.number != 1 %}
+                          <a class="btn btn-outline-info disabled">{{ num }}</a>
+                      {% endif %}
+                    {% endfor %}
+
+
+                    {% if page_obj.has_next %}
+                        <a class="btn btn-outline-info" href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
+                        <a class="btn btn-outline-info" href="?page={{page_obj.paginator.num_pages}}">&raquo;</a>
+
+                    {% endif %}
+
+                {% endif %}
+
+              {% endif %}
+
+            </div>
+
+
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block body %}
+
+
+  <main role="main" class="container">
+
+    <h2>Details</h2>
+
+
+      <hr class="featurette-divider">
+
+      {% if object.is_active == False %}
+            {% if object.last_bidder == user %}
+
+                <div class="alert alert-success" role="alert">
+                  This auction is closed and you are the winner!
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                  This auction is closed right now!
+                </div>
+
+            {% endif %}
+
+            <hr class="featurette-divider">
+      {% endif %}
+
+
+      {% if object.is_active == False %}
+
+          <span class="badge badge-danger">Sold</span>
+
+      {% endif %}
+
+
+
+      <div class="row featurette">
+        <div class="col-md-7 order-md-2">
+          {% if user in object.watchers.all %}
+              <span class="badge badge-pill badge-warning">In your watchlist</span>
+          {% endif %}
+
+          <h2 class="featurette-heading">{{object.title}}</h2>
+          <h3><span class="text-muted">Price: ${{ object.current_price }}</span></h3>
+          <p class="lead">{{ object.description }}</p>
+          <footer class="blockquote-footer">Created by: {{ object.created_by }} on <cite title="Source Title">{{ object.date|date }}</cite></footer>
+
+        </div>
+
+        <div class="col-md-5 order-md1">
+          <img class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" src="{{ object.image_url }}" id="item-img" alt="">
+
+        </div>
+
+      </div>
+
+      {% if object.is_active and object.created_by != user and user.is_authenticated %}
+
+          <hr class="featurette-divider">
+
+          {% if user in object.watchers.all %}
+              <a role="button" class="btn btn-outline-danger mx-sm-3 mb-4" href="{% url 'remove_from_watchlist' object.id %}">Remove from Watchlist</a>
+          {% else %}
+              <a role="button" class="btn btn-outline-success mx-sm-3 mb-4" href="{% url 'add_to_watchlist' object.id %}">Add to Watchlist</a>
+          {% endif %}
+
+          {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+          {% endif %}
+
+
+          <form class="form-inline" action="{% url 'make_bid' object.id %}" method="post">
+            {% csrf_token %}
+
+            <div class="form-group mx-sm-3 mb-2">
+              <label for="bidAmount" class="sr-only">Bid Amount</label>
+              <input type="number" class="form-control" name="newBid" placeholder="Bid Amount">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Bid</button>
+          </form>
+      {% endif %}
+
+      <hr class="featurette-divider">
+
+      <div class="featurette">
+        <h4>Comments:</h4>
+
+        {% if comments %}
+
+            {% for comment in comments %}
+
+                <div class="card shadow">
+                  <div class="card-header">
+                    {{ comment.title }}
+
+                    {% if comment.rate == 1%}
+                        <span class="fa fa-star checked" style="padding-left: 800px;"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                    {% endif %}
+
+                    {% if comment.rate == 2%}
+                        <span class="fa fa-star checked" style="padding-left: 800px;"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                    {% endif %}
+                    {% if comment.rate == 3%}
+                        <span class="fa fa-star checked" style="padding-left: 800px;"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                    {% endif %}
+
+                    {% if comment.rate == 4%}
+                        <span class="fa fa-star checked" style="padding-left: 800px;"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                    {% endif %}
+                    {% if comment.rate == 5%}
+                        <span class="fa fa-star checked" style="padding-left: 800px;"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                    {% endif %}
+
+
+                  </div>
+                  <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                      <p>{{ comment.content }}</p>
+                      <footer class="blockquote-footer">{{ comment.comment_user.username }} on <cite title="Source Title">{{ comment.date|date }}</cite></footer>
+                    </blockquote>
+                  </div>
+                </div>
+
+            {% endfor %}
+
+
+        {% else %}
+            <p>There is no comment for this item right now.</p>
+        {% endif %}
+      </div>
+      {% if user.is_authenticated and user.id != object.created_by.id %}
+
+            <hr class="featurette-divider">
+            <h5>Make a Comment:</h5>
+            <form action="{% url 'make_comment' object.id %}" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="exampleFormControlInput1">Title</label>
+                <input name="title" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Title">
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">Rate</label>
+                <select name="rate" class="form-control" id="formControlSelect1">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlTextarea1">Content</label>
+                <textarea name="content" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary mb-2">Submit</button>
+            </form>
+
+      {% endif %}
+
+      {% if user.is_authenticated and object.is_active and user.id == object.created_by.id %}
+
+          <hr class="featurette-divider">
+
+          <a role="button" class="btn btn-outline-danger mx-sm-3 mb-4" href="{% url 'close_auction' object.id %}">Close the Auction</a>
+
+    {% endif %}
+
+
+
+  </main><!-- /.container -->
+
+
+
+
+{% endblock %}

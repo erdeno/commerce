@@ -1,0 +1,66 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Create New Listing{% endblock %}
+
+{% block body %}
+    <h2>Create New Listing</h2>
+
+    <div class="container">
+      <div class="form-row align-items-center"">
+        <div class="col-lg-6">
+
+          {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+          {% endif %}
+
+          <form method="post">
+              {% csrf_token %}
+              <div class="control-group">
+                <div class="form-group floating-label-form-group controls">
+                  <label>Title</label>
+                  {{ form.title }}
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="form-group floating-label-form-group controls">
+                  <label>Category</label>
+                  {{ form.category }}
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="form-group floating-label-form-group controls">
+                  <label for="description">Description</label>
+                  {{ form.description }}
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="form-group floating-label-form-group controls">
+                  <label for="image_url">Image Url</label>
+                  {{ form.image_url }}
+                </div>
+              </div>
+              <div class="control-group">
+                  <div class="form-group floating-label-form-group controls">
+                    <label for="image_url">Starting Price</label>
+                    {{ form.starting_price }}
+                  </div>
+                </div>
+              <br>
+              <div id="success"></div>
+              <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+
+          </form>
+
+
+        </div>
+      </div>
+    </div>
+
+
+
+
+{% endblock %}
